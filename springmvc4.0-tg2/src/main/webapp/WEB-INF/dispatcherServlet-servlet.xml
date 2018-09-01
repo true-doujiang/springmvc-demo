@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	http://www.springframework.org/schema/mvc 
+	http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+	
+	<!--<context:annotation-config/>  -->
+	<!-- 配置自定扫描的包 , 这个注解有上面那个注解的功能了 -->
+	<context:component-scan base-package="com.atguigu.springmvc"/>
+
+
+	<!-- SpringMVC为逻辑视图名的解析提供了不同的策略, 并指定他们之间的先后顺序 -->
+	<!-- 配置视图解析器1: 如何把 handler 方法返回值解析为实际的物理视图 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/"></property>
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+	<!-- 配置视图解析器2: BeanNameViewResolver(他会把你自定义的视图解析器加载进来)  使用视图的名字来解析视图   -->
+	<!-- 通过 order属性来定义视图解析器的优先级, order 值越小优先级越高 -->
+	<bean class="org.springframework.web.servlet.view.BeanNameViewResolver">
+		<property name="order" value="100" />
+	</bean>
+	
+	
+	<!-- 配置国际化资源文件 -->
+	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename" value="i18n" />	
+	</bean>
+	
+	
+	
+	<!-- 配置直接转发的页面 http://localhost:8088/springmvc4.0_tg1/admin-->
+	<!-- 单独讲的这个标签
+	可以直接相应转发的页面, 而无需再经过 Handler 的方法. 若用了此标签就必须加上<mvc:annotation-driven /> 标签 ,否则其他映射路径就访问不到了-->
+	<mvc:view-controller path="/admin" view-name="success" />
+
+	<!-- 在实际开发中通常都需配置 mvc:annotation-driven 标签 -->
+	<mvc:annotation-driven />
+	
+
+	
+</beans>
