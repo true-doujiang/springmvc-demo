@@ -8,10 +8,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import com.atguigu.springmvc.entities.User;
+import org.springframework.web.bind.annotation.support.HandlerMethodInvoker;
 
-
-
-@SessionAttributes(value={"user"})
+/**
+ * org.springframework.web.HttpSessionRequiredException: Expected session attribute 'user'
+ * A handler 目标方法的入参 用@ModelAttribute(value = "user")修饰了  而且没有@ModelAttribute getUser() 则目标方法就会
+ * 看A handler 有没有被@SessionAttributes(value={"user"}) 修饰
+ *  若修饰了就会从HttpSession中获取相对应的key，找不到就会上面的抛异常，尴尬了
+ *  若没有修饰则会用反射创建一个新对象作为目标方法的入参，反而没事
+ *
+ *  演示：
+ *  1 把@ModelAttribute getUser()注释
+ *  2 Controller 添加@SessionAttributes(value={"user"})
+ *  3 testModelAttribute(@ModelAttribute(value="user")User user)  key必须与@SessionAttributes 的可以相同
+ */
+//@SessionAttributes(value={"user"}) //与@ModelAttribute一起演示异常
 @RequestMapping("/springmvc")
 @Controller
 public class TestModelAttribute {
@@ -19,20 +30,19 @@ public class TestModelAttribute {
 
 	private static final String SUCCESS = "model";
 
-
-
-	/**
-	 * 1. 有 @ModelAttribute 标记的方法, 会在每个目标方法执行之前被 SpringMVC调用!
+	/** @ModelAttribute用法：
+     *
+	 * 1. @ModelAttribute 标记的方法, 会在每个目标方法执行之前被 SpringMVC调用!
 	 *
-	 * 2. @ModelAttribute 注解也可以来修饰目标方法 POJO类型的入参, 其 value 属性值有如下的作用:
+	 * 2. @ModelAttribute 注解也可以来修饰目标方法 POJO类型的 入参, 其 value 属性值有如下的作用:
 	 * 		1). SpringMVC 会使用 value 属性值在 implicitModel 中查找对应的对象, 若存在则会直接传入到目标方法的入参中.
-	 * 		2). SpringMVC 会以 value 为 key, POJO 类型的对象为 value, 存入到 request 中.
+	 * 		2). SpringMVC 会以 value 为 key, POJO 类型的对象为 value, 存入到 request 中. (也是就是说可以在jsp中使用${requestScope.key})
 	 */
 	@ModelAttribute   //很重要的
 	public void getUser(
 	        @RequestParam(value="id",required=false) Integer id,
 			Map<String, Object> map){
-
+        //HandlerMethodInvoker
 		System.out.println("@ModelAttribute注解的 method");
 
 		if(id != null){
@@ -60,13 +70,17 @@ public class TestModelAttribute {
 	 * 1.确定一个 key:
 	 * 	 1).若目标方法的 POJO 类型的参数木有使用 @ModelAttribute 作为修饰, 则 key 为 POJO 类名第一个字母的小写
 	 * 	 2).若使用了  @ModelAttribute 来修饰, 则 key 为 @ModelAttribute 注解的 value 属性值.
+     *
 	 * 2.在 implicitModel中查找 key对应的对象, 若存在,则作为入参传入
 	 * 	 1).若在 @ModelAttribute 标记的方法中在Map中保存过,且 key和 1 确定的 key一致, 则会获取到.
+     *
 	 * 3.若 implicitModel中不存在 key对应的对象,则检查当前的 Handler是否使用 @SessionAttributes 注解修饰,
 	 * 	   若使用了该注解, 且 @SessionAttributes 注解的 value 属性值中包含了 key, 则会从 HttpSession中来获取 key所
 	 *   对应的 value值, 若存在则直接传入到目标方法的入参中. 若不存在则将抛出异常. ---抛异常了----
+     *
 	 * 4.若 Handler没有标识 @SessionAttributes 注解或 @SessionAttributes 注解的 value值中不包含 key,则
 	 *   会通过反射来创建 POJO类型的参数,传入为目标方法的参数
+     *
 	 * 5. SpringMVC会把 key和 POJO类型的对象保存到 implicitModel中,进而会保存到 request中.
 	 */
 

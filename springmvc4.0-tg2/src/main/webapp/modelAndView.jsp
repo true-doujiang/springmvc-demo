@@ -11,15 +11,14 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   </head>
   <body>
 
-
-  -----------------------------------------------------------------------------------------------------
   <a href="springmvc/testModelAndView">Test ModelAndView</a>
   <br><br>
 
 
   -----------------------------------------------------------------------------------------------------
-	<a href="springmvc/testMap">Test Map</a>
-	<br><br>
+  <br><br>
+  <a href="springmvc/testMap">Test Map</a>
+  <br><br>
 
 
 

@@ -7,7 +7,7 @@
 	http://www.springframework.org/schema/beans/spring-beans.xsd
 	http://www.springframework.org/schema/context 
 	http://www.springframework.org/schema/context/spring-context-4.0.xsd">
-	
+
 	<!--<context:annotation-config/>  -->
 	<!-- 配置自定扫描的包 , 这个注解有上面那个注解的功能了 -->
 	<context:component-scan base-package="com.atguigu.springmvc"/>
@@ -18,5 +18,5 @@
 		<property name="suffix" value=".jsp"></property>
 	</bean>
 	
-	
+
 </beans>
